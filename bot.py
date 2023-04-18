@@ -9,7 +9,7 @@ from handlers import questions, different_types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from keyboards import key
 
-ADDRESS = 605850528
+ADDRESS = 1404348569
 
 
 async def morning(bot):  # утренние кнопки, отрабатывающиеся в 5 часов утра
@@ -50,7 +50,7 @@ async def set_button(once=False):
     if once:
         kb = [[types.KeyboardButton(text="Поела")]]
     else:
-        if datetime.datetime.now().hour < 20:
+        if datetime.datetime.now().hour < 16:
             kb = [
                 [
                     types.KeyboardButton(text="Через 3 часа"),
@@ -77,7 +77,7 @@ async def set_button(once=False):
 
 
 def set_scheduled_jobs(scheduler, bot, *args, **kwargs):  # задание работы на каждое утро
-    scheduler.add_job(morning, "cron", hour=5, minute=0, second=0, args=[bot])
+    scheduler.add_job(morning, "cron", hour=1, minute=0, second=0, args=[bot])
 
 
 def set_new_job(hour=0, minute=0, *args, **kwargs):
