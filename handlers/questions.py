@@ -11,13 +11,14 @@ router = Router()  # [1]
 @router.message(Command("start"))  # [2]
 async def cmd_start(message: Message):
     await message.answer(
-        str(message.chat.id),
-        reply_markup=ReplyKeyboardRemove()
+        text=str(message.chat.id)
     )
+
 
 @router.message(Command("help"))  # [2]
 async def cmd_help(message: Message):
     key.scheduler_g.print_jobs()
+
 
 @router.message(Text(text="Через 1 час", ignore_case=True))
 async def answer_1_hour(message: Message):
