@@ -27,7 +27,7 @@ async def answer_1_hour(message: Message):
         "Это здорово! Жду 1 час...",
         reply_markup=ReplyKeyboardRemove()
     )
-    await bot.set_button(once=True)
+    await bot.set_button()
 
 
 @router.message(Text(text="Через 2 часа", ignore_case=True))
@@ -37,7 +37,7 @@ async def answer_2_hour(message: Message):
         "Это здорово! Жду 2 часа...",
         reply_markup=ReplyKeyboardRemove()
     )
-    await bot.set_button(once=True)
+    await bot.set_button()
 
 
 @router.message(Text(text="Через 3 часа", ignore_case=True))
@@ -47,7 +47,7 @@ async def answer_3_hour(message: Message):
         "Это здорово! Жду 3 часа...",
         reply_markup=ReplyKeyboardRemove()
     )
-    await bot.set_button(once=True)
+    await bot.set_button()
 
 
 @router.message(Text(text="Через 4 часа", ignore_case=True))
@@ -57,14 +57,14 @@ async def answer_4_hour(message: Message):
         "Это здорово! Жду 4 часа...",
         reply_markup=ReplyKeyboardRemove()
     )
-    await bot.set_button(once=True)
+    await bot.set_button()
 
 
 @router.message(Text(text="Сон", ignore_case=True))
 async def answer_sleep(message: Message):
     if key.job != None:
         key.job.remove()
-
+        key.job = None
     await message.answer(
         "Доброй ночи",
         reply_markup=ReplyKeyboardRemove()
@@ -74,6 +74,17 @@ async def answer_sleep(message: Message):
 @router.message(Text(text="Поела", ignore_case=True))
 async def answer_eated(message: Message):
     key.job.remove()
+    key.job = None
+    await message.answer(
+        "Это здорово!",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await bot.set_button()
+
+@router.message(Text(text="Поела", ignore_case=True))
+async def answer_eated(message: Message):
+    key.job.remove()
+    key.job = None
     await message.answer(
         "Это здорово!",
         reply_markup=ReplyKeyboardRemove()
