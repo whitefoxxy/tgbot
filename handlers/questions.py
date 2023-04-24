@@ -1,3 +1,5 @@
+import random
+
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.filters.text import Text
@@ -81,12 +83,23 @@ async def answer_eated(message: Message):
     )
     await bot.set_button()
 
-@router.message(Text(text="Поела", ignore_case=True))
-async def answer_eated(message: Message):
-    key.job.remove()
-    key.job = None
+@router.message(Text(text="Статистика", ignore_case=True))
+async def answer_stat(message: Message):
     await message.answer(
-        "Это здорово!",
-        reply_markup=ReplyKeyboardRemove()
+        "Вот твои данные, Лиса"
+    )
+    await bot.set_button(sett=True)
+
+
+@router.message(Text(text="Назад", ignore_case=True))
+async def answer_back(message: Message):
+    await message.answer(
+        "Ня"
     )
     await bot.set_button()
+
+@router.message(Text(text="Камень-ножницы-бумага", ignore_case=True))
+async def answer_random(message: Message):
+    await message.answer(
+        random.choice(['камень', 'ножницы', 'бумага'])
+    )

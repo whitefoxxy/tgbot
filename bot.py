@@ -4,12 +4,14 @@ import multiprocessing
 
 from aiogram import Bot, Dispatcher
 from aiogram import types
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from handlers import questions, different_types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from keyboards import key
+import sqlite3
 
-ADDRESS = 1404348569
+ADDRESS = 1404348569  #
 
 
 async def morning(bot):  # утренние кнопки, отрабатывающиеся в 5 часов утра
@@ -46,36 +48,47 @@ async def send_every_15_minute():
     await bot.send_message(chat_id=ADDRESS, text="Поешь, прошло 15 минут!")
 
 
-async def set_button():
+async def set_button(sett=False):
     bot = key.bot_g
-    if datetime.datetime.now().hour < 16:
+    if sett:
         kb = [
             [
-                types.KeyboardButton(text="Через 1 час"),
-                types.KeyboardButton(text="Через 2 часа"),
-                types.KeyboardButton(text="Через 3 часа"),
-                types.KeyboardButton(text="Через 4 часа"),
-                types.KeyboardButton(text="Поела")
+                types.KeyboardButton(text="Камень-ножницы-бумага"),
+                types.KeyboardButton(text="Назад")
             ],
         ]
     else:
-        kb = [
-            [
-                types.KeyboardButton(text="Через 1 час"),
-                types.KeyboardButton(text="Через 2 часа"),
-                types.KeyboardButton(text="Через 3 часа"),
-                types.KeyboardButton(text="Через 4 часа"),
-                types.KeyboardButton(text="Сон"),
-                types.KeyboardButton(text="Поела")
-            ],
-        ]
+        if datetime.datetime.now().hour < 16:
+            kb = [
+                [
+                    types.KeyboardButton(text="Через 1 час"),
+                    types.KeyboardButton(text="Через 2 часа"),
+                    types.KeyboardButton(text="Через 3 часа"),
+                    types.KeyboardButton(text="Через 4 часа"),
+                    types.KeyboardButton(text="Поела"),
+                    types.KeyboardButton(text="Статистика")
+                ],
+            ]
+        else:
+            kb = [
+                [
+                    types.KeyboardButton(text="Через 1 час"),
+                    types.KeyboardButton(text="Через 2 часа"),
+                    types.KeyboardButton(text="Через 3 часа"),
+                    types.KeyboardButton(text="Через 4 часа"),
+                    types.KeyboardButton(text="Сон"),
+                    types.KeyboardButton(text="Поела"),
+                    types.KeyboardButton(text="Статистика")
+                ],
+            ]
 
-    keyboard = types.ReplyKeyboardMarkup(
-        keyboard=kb,
-        resize_keyboard=True,
-        input_field_placeholder="Жду твой выбор =)"
-    )
-    await bot.send_message(chat_id=ADDRESS, text="Примите позу ожидания", reply_markup=keyboard)
+    builder = ReplyKeyboardBuilder()
+    for i in kb[0]:
+        builder.add(i)
+    builder.adjust(3)
+    await bot.send_message(chat_id=ADDRESS, text="Примите позу ожидания",
+                           reply_markup=builder.as_markup(resize_keyboard=True,
+                                                          input_field_placeholder="Жду твой выбор =)"))
 
 
 def set_scheduled_jobs(scheduler, bot, *args, **kwargs):  # задание работы на каждое утро
@@ -100,6 +113,8 @@ async def my():
     dp.include_routers(questions.router, different_types.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
+
+    con = sqlite3.connect("tutorial.db")
 
     scheduler = AsyncIOScheduler()
     scheduler.start()
