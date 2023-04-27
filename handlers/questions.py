@@ -71,17 +71,22 @@ async def answer_sleep(message: Message):
         "Доброй ночи",
         reply_markup=ReplyKeyboardRemove()
     )
+    key.chet = 0
 
 
 @router.message(Text(text="Поела", ignore_case=True))
 async def answer_eated(message: Message):
     key.job.remove()
     key.job = None
+    key.chet += 1
+
     await message.answer(
         "Это здорово!",
         reply_markup=ReplyKeyboardRemove()
     )
+    await key.bot_g.send_message(chat_id=605850528, text=f"Поела {key.chet}")
     await bot.set_button()
+
 
 @router.message(Text(text="Статистика", ignore_case=True))
 async def answer_stat(message: Message):
