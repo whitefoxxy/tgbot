@@ -26,7 +26,7 @@ async def cmd_help(message: Message):
 async def answer_1_hour(message: Message):
     bot.set_new_job(hour=1)
     await message.answer(
-        "Это здорово! Жду 1 час...",
+        f"{random.choice(key.waiting_key)} Жду 1 час...",
         reply_markup=ReplyKeyboardRemove()
     )
     await bot.set_button()
@@ -36,7 +36,7 @@ async def answer_1_hour(message: Message):
 async def answer_2_hour(message: Message):
     bot.set_new_job(hour=2)
     await message.answer(
-        "Это здорово! Жду 2 часа...",
+        f"{random.choice(key.waiting_key)} Жду 2 часа...",
         reply_markup=ReplyKeyboardRemove()
     )
     await bot.set_button()
@@ -46,7 +46,7 @@ async def answer_2_hour(message: Message):
 async def answer_3_hour(message: Message):
     bot.set_new_job(hour=3)
     await message.answer(
-        "Это здорово! Жду 3 часа...",
+        f"{random.choice(key.waiting_key)} Жду 3 часа...",
         reply_markup=ReplyKeyboardRemove()
     )
     await bot.set_button()
@@ -56,7 +56,7 @@ async def answer_3_hour(message: Message):
 async def answer_4_hour(message: Message):
     bot.set_new_job(hour=4)
     await message.answer(
-        "Это здорово! Жду 4 часа...",
+        f"{random.choice(key.waiting_key)} Жду 4 часа...",
         reply_markup=ReplyKeyboardRemove()
     )
     await bot.set_button()
@@ -72,6 +72,7 @@ async def answer_sleep(message: Message):
         reply_markup=ReplyKeyboardRemove()
     )
     key.chet = 0
+    key.perec = 0
 
 
 @router.message(Text(text="Поела", ignore_case=True))
@@ -85,6 +86,20 @@ async def answer_eated(message: Message):
         reply_markup=ReplyKeyboardRemove()
     )
     await key.bot_g.send_message(chat_id=605850528, text=f"Поела {key.chet}")
+    await bot.set_button()
+
+
+@router.message(Text(text="Перекусила", ignore_case=True))
+async def answer_eated_no(message: Message):
+    key.job.remove()
+    key.job = None
+    key.perec += 1
+
+    await message.answer(
+        "Хоть так)",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await key.bot_g.send_message(chat_id=605850528, text=f"перекусила {key.perec}")
     await bot.set_button()
 
 
@@ -102,6 +117,7 @@ async def answer_back(message: Message):
         "Ня"
     )
     await bot.set_button()
+
 
 @router.message(Text(text="Камень-ножницы-бумага", ignore_case=True))
 async def answer_random(message: Message):
