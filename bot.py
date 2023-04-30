@@ -56,6 +56,9 @@ async def set_button(sett=False):
         kb = [
             [
                 types.KeyboardButton(text="Камень-ножницы-бумага"),
+                types.KeyboardButton(text="График"),
+                types.KeyboardButton(text="За день"),
+                types.KeyboardButton(text="За неделю"),
                 types.KeyboardButton(text="Назад")
             ],
         ]
@@ -97,9 +100,19 @@ def set_new_job(hour=0, minute=0, *args, **kwargs):
     else:
         key.job = key.scheduler_g.add_job(send_every_15_minute, "interval", minutes=minute, args=[])
 
+def data_out_table():
+    return key.cur.execute("SELECT eda, perecus FROM Stat limit 7").fetchall()
 
-def create_table(con: sqlite3.Connection):
-    pass
+def data_in_table():
+    key.cur.execute("INSERT INTO Stat(date, eda, perecus) VALUES(?, ?, ?)", [datetime.datetime.today(), key.chet, key.perec])
+    key.con.commit()
+
+def create_table(cur: sqlite3.Cursor):
+    cur.execute("""CREATE TABLE IF NOT EXISTS Stat(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    date DATE NOT NULL,
+                    eda INTEGER NOT NULL,
+                    perecus INTEGER NOT NULL)""")
 
 
 # Запуск бота
@@ -111,8 +124,10 @@ async def my():
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    con = sqlite3.connect("tutorial.db")
-    create_table(con)
+    con = sqlite3.connect("my_BD.db")
+    cur = con.cursor()
+    key.cur, key.con = cur, con
+    create_table(cur)
 
     scheduler = AsyncIOScheduler()
     scheduler.start()

@@ -71,6 +71,7 @@ async def answer_sleep(message: Message):
         "Доброй ночи",
         reply_markup=ReplyKeyboardRemove()
     )
+    bot.data_in_table()
     key.chet = 0
     key.perec = 0
 
@@ -123,4 +124,28 @@ async def answer_back(message: Message):
 async def answer_random(message: Message):
     await message.answer(
         random.choice(['камень', 'ножницы', 'бумага'])
+    )
+
+@router.message(Text(text="График", ignore_case=True))
+async def answer_graph(message: Message):
+    await message.answer(
+        "Функционал кнопки находится в разработке"
+    )
+
+@router.message(Text(text="За день", ignore_case=True))
+async def answer_day_today(message: Message):
+    await message.answer(
+        f"Сегодня ты поела: {key.chet} раз\nПерекусила: {key.perec} раз"
+    )
+
+@router.message(Text(text="За неделю", ignore_case=True))
+async def answer_week_today(message: Message):
+    eda, pererus, n = 0, 0, 0
+    for ed, per in bot.data_out_table():
+        n += 1
+        eda += ed
+        pererus += per
+
+    await message.answer(
+        f"За неделю(или {n} дней) ты поела: {eda} раз\nПерекусила: {pererus} раз"
     )
