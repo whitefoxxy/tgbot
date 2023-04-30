@@ -101,7 +101,7 @@ def set_new_job(hour=0, minute=0, *args, **kwargs):
         key.job = key.scheduler_g.add_job(send_every_15_minute, "interval", minutes=minute, args=[])
 
 def data_out_table():
-    return key.cur.execute("SELECT eda, perecus FROM Stat limit 7").fetchall()
+    return key.cur.execute("SELECT eda, perecus FROM Stat ORDER BY id DESC LIMIT 7").fetchall()
 
 def data_in_table():
     key.cur.execute("INSERT INTO Stat(date, eda, perecus) VALUES(?, ?, ?)", [datetime.datetime.today(), key.chet, key.perec])
