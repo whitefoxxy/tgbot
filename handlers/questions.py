@@ -64,17 +64,11 @@ async def answer_4_hour(message: Message):
 
 @router.message(Text(text="Сон", ignore_case=True))
 async def answer_sleep(message: Message):
-    if key.job != None:
-        key.job.remove()
-        key.job = None
     await message.answer(
-        "Доброй ночи",
+        random.choice(key.nignt_key),
         reply_markup=ReplyKeyboardRemove()
     )
-    bot.data_in_table()
-    key.chet = 0
-    key.perec = 0
-
+    bot.end_of_day()
 
 @router.message(Text(text="Поела", ignore_case=True))
 async def answer_eated(message: Message):

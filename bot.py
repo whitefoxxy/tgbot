@@ -33,7 +33,6 @@ async def morning(bot):  # утренние кнопки, отрабатываю
 
 
 async def send_every_X_hour(hour):
-    job = key.job
     bot = key.bot_g
     if hour == 1:
         await bot.send_message(chat_id=ADDRESS, text="Прошёл 1 час, пора кушать!")
@@ -81,12 +80,24 @@ async def set_button(sett=False):
     for i in kb[0]:
         builder.add(i)
     builder.adjust(3)
+
     await bot.send_message(chat_id=ADDRESS, text="Примите позу ожидания",
                            reply_markup=builder.as_markup(resize_keyboard=True,
                                                           input_field_placeholder="Жду твой выбор =)"))
 
 
+def end_of_day():
+    if key.job != None:
+        key.job.remove()
+        key.job = None
+
+    data_in_table()
+    key.chet = 0
+    key.perec = 0
+
+
 def set_scheduled_jobs(scheduler, bot, *args, **kwargs):  # задание работы на каждое утро
+    scheduler.add_job(end_of_day, "cron", hour=0, minute=59, second=50)
     scheduler.add_job(morning, "cron", hour=1, minute=0, second=0, args=[bot])
 
 
