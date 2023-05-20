@@ -128,7 +128,7 @@ async def my():  # TODO: create save's
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    con = sqlite3.connect("~/stat_FBot.db")
+    con = sqlite3.connect("/root/stat_FBot.db")
     key.con = con
 
     scheduler = AsyncIOScheduler()
