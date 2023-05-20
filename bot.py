@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import multiprocessing
 import random
 
 from aiogram import Bot, Dispatcher
@@ -11,11 +10,14 @@ from handlers import questions, different_types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from keyboards import key
 import sqlite3
+import csv
 
-ADDRESS = 1404348569  #
+
+# ADDRESS = 1404348569  #
 
 
-async def morning(bot):  # утренние кнопки, отрабатывающиеся в 5 часов утра
+async def morning(bot, address):
+    key.user_id_work[address][0].flag_sleep = True
     kb = [
         [
             types.KeyboardButton(text="Через 1 час"),
@@ -29,28 +31,23 @@ async def morning(bot):  # утренние кнопки, отрабатываю
         resize_keyboard=True,
         input_field_placeholder="Жду когда покушаешь..."
     )
-    await bot.send_message(chat_id=ADDRESS, text=random.choice(key.morning_key), reply_markup=keyboard)
+    await bot.send_message(chat_id=address, text=random.choice(key.morning_key), reply_markup=keyboard)
 
 
-async def send_every_X_hour(hour):
-    bot = key.bot_g
+async def send_every_X_hour(user_id, hour):
     if hour == 1:
-        await bot.send_message(chat_id=ADDRESS, text="Прошёл 1 час, пора кушать!")
+        await key.bot.send_message(chat_id=user_id, text="Прошёл 1 час, пора кушать!")
     else:
-        await bot.send_message(chat_id=ADDRESS, text=f"Прошло {hour} часа, пора кушать!")
+        await key.bot.send_message(chat_id=user_id, text=f"Прошло {hour} часа, пора кушать!")
 
-    key.job.remove()
-    key.job = None
-    set_new_job(0, minute=15)
+    set_new_job(user_id, hour=0, minute=15)
 
 
-async def send_every_15_minute():
-    bot = key.bot_g
-    await bot.send_message(chat_id=ADDRESS, text="Поешь, прошло 15 минут!")
+async def send_every_15_minute(user_id):
+    await key.bot.send_message(chat_id=user_id, text="Поешь, прошло 15 минут!")
 
 
-async def set_button(sett=False):
-    bot = key.bot_g
+async def set_button(user_id, sett=False):
     if sett:
         kb = [
             [
@@ -81,70 +78,63 @@ async def set_button(sett=False):
         builder.add(i)
     builder.adjust(3)
 
-    await bot.send_message(chat_id=ADDRESS, text="Примите позу ожидания",
-                           reply_markup=builder.as_markup(resize_keyboard=True,
-                                                          input_field_placeholder="Жду твой выбор =)"))
+    await key.bot.send_message(chat_id=user_id, text="Примите позу ожидания",
+                               reply_markup=builder.as_markup(resize_keyboard=True,
+                                                              input_field_placeholder="Жду твой выбор =)"))
 
 
-def end_of_day():
-    if key.job != None:
-        key.job.remove()
-        key.job = None
-
-    data_in_table()
-    key.chet = 0
-    key.perec = 0
+def end_of_day(user_id):
+    if key.user_id_work[user_id][0].flag_sleep:
+        data_in_table(key.user_id_work[user_id][0])
+        key.user_id_work[user_id][0].incr_var(n=2)
+        key.user_id_work[user_id][0].flag_sleep = False
 
 
-def set_scheduled_jobs(scheduler, bot, *args, **kwargs):  # задание работы на каждое утро
-    scheduler.add_job(end_of_day, "cron", hour=0, minute=59, second=50)
-    scheduler.add_job(morning, "cron", hour=1, minute=0, second=0, args=[bot])
+def set_new_user_jobs_morning(user_id):  # задание работы на каждое утро
+    user = key.user_id_work[user_id][0]
+    user.set_time_0(key.scheduler.add_job(end_of_day, "cron", hour=key.user_id_work[user_id][-2] * (
+            ((key.user_id_work[user_id][-1] + 59) % 60) != 59) + (key.user_id_work[user_id][-2] - 1) * (((
+                                                                                                                 key.user_id_work[
+                                                                                                                     user_id][
+                                                                                                                     -1] + 59) % 60) == 59),
+                                          minute=(key.user_id_work[user_id][-1] + 59) % 60, second=50),
+                    key.scheduler.add_job(morning, "cron", hour=key.user_id_work[user_id][-2],
+                                          minute=key.user_id_work[user_id][-1], second=0, args=[key.bot]),
+                    ch=key.user_id_work[user_id][-2], m=key.user_id_work[user_id][-1])
 
 
-def set_new_job(hour=0, minute=0, *args, **kwargs):
-    if key.job is not None:
-        key.job.remove()
-        key.job = None
-
+def set_new_job(user_id, hour=0, minute=0):
     if hour != 0:
-        key.job = key.scheduler_g.add_job(send_every_X_hour, "interval", hours=hour, args=[hour])
+        job = key.user_id_work[user_id][0].job = key.scheduler.add_job(send_every_X_hour, "interval", hours=hour,
+                                                                       args=[user_id, hour])
     else:
-        key.job = key.scheduler_g.add_job(send_every_15_minute, "interval", minutes=minute, args=[])
+        job = key.user_id_work[user_id][0].job = key.scheduler.add_job(send_every_15_minute, "interval", minutes=minute,
+                                                                       args=[user_id])
+    key.user_id_work[user_id][0].set_new_var_job(job)
 
-def data_out_table():
-    return key.cur.execute("SELECT eda, perecus FROM Stat ORDER BY id DESC LIMIT 7").fetchall()
 
-def data_in_table():
-    key.cur.execute("INSERT INTO Stat(date, eda, perecus) VALUES(?, ?, ?)", [datetime.datetime.today(), key.chet, key.perec])
+def data_in_table(user: key.User):
+    user.data_in_table()
     key.con.commit()
-
-def create_table(cur: sqlite3.Cursor):
-    cur.execute("""CREATE TABLE IF NOT EXISTS Stat(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    date DATE NOT NULL,
-                    eda INTEGER NOT NULL,
-                    perecus INTEGER NOT NULL)""")
 
 
 # Запуск бота
-async def my():
+async def my():  # TODO: create save's
     bot = Bot(token=open("ass.txt").readline())
-    key.bot_g = bot
+    key.bot = bot
+
     dp = Dispatcher()
     dp.include_routers(questions.router, different_types.router)
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    con = sqlite3.connect("my_BD.db")
-    cur = con.cursor()
-    key.cur, key.con = cur, con
-    create_table(cur)
+    con = sqlite3.connect("~/stat_FBot.db")
+    key.con = con
 
     scheduler = AsyncIOScheduler()
     scheduler.start()
 
-    set_scheduled_jobs(scheduler, bot)
-    key.scheduler_g = scheduler
+    key.scheduler = scheduler
     await dp.start_polling(bot)
 
 
