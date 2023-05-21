@@ -26,18 +26,18 @@ class User:
         self.job0 = job0
 
     def create_table(self):
-        self.cur.execute(f"""CREATE TABLE IF NOT EXISTS Stat_?(
+        self.cur.execute(f"""CREATE TABLE IF NOT EXISTS Stat_{self.ADDRESS}(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         date DATE NOT NULL,
                         eda INTEGER NOT NULL,
-                        perecus INTEGER NOT NULL)""", self.ADDRESS)
+                        perecus INTEGER NOT NULL)""")
 
     def data_out_table(self):
-        return self.cur.execute("SELECT eda, perecus FROM Stat_? ORDER BY id DESC LIMIT 7", self.ADDRESS).fetchall()
+        return self.cur.execute(f"SELECT eda, perecus FROM Stat_{self.ADDRESS} ORDER BY id DESC LIMIT 7").fetchall()
 
     def data_in_table(self):
-        self.cur.execute("INSERT INTO Stat_?(date, eda, perecus) VALUES(?, ?, ?)",
-                         [self.ADDRESS, datetime.datetime.today(), self.eda, self.nedo_eda])
+        self.cur.execute(f"INSERT INTO Stat_{self.ADDRESS}(date, eda, perecus) VALUES(?, ?, ?)",
+                         [datetime.datetime.today(), self.eda, self.nedo_eda])
 
     def set_new_var_job(self, job):
         self.delete_job()

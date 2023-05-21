@@ -32,7 +32,7 @@ async def cmd_time(message: Message, command: CommandObject):
 
 
 @router.message(Command("restart"))  # [2]
-async def cmd_restart():
+async def cmd_restart(message: Message):
     for user_id in list(key.user_id_work.keys()):
         key.bot.send_message(chat_id=user_id, text="Бот уходит на тех.работы. Прошу прощения за неудобства")
 
@@ -43,7 +43,7 @@ async def cmd_end(message: Message):
 
 
 @router.message(Command("help"))  # [2]
-async def cmd_help():
+async def cmd_help(message: Message):
     key.scheduler.print_jobs()
 
 
