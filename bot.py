@@ -92,23 +92,24 @@ def end_of_day(user_id):
 
 def set_new_user_jobs_morning(user_id):  # задание работы на каждое утро
     user = key.user_id_work[user_id][0]
-    user.set_time_0(key.scheduler.add_job(end_of_day, "cron", hour=key.user_id_work[user_id][-2] * (
-            ((key.user_id_work[user_id][-1] + 59) % 60) != 59) + (key.user_id_work[user_id][-2] - 1) * (((
-                                                                                                                 key.user_id_work[
-                                                                                                                     user_id][
-                                                                                                                     -1] + 59) % 60) == 59),
-                                          minute=(key.user_id_work[user_id][-1] + 59) % 60, second=50),
-                    key.scheduler.add_job(morning, "cron", hour=key.user_id_work[user_id][-2],
-                                          minute=key.user_id_work[user_id][-1], second=0, args=[key.bot]),
-                    ch=key.user_id_work[user_id][-2], m=key.user_id_work[user_id][-1])
+    h = (((key.user_id_work[user_id][-1] + 59) % 60) == 59)
+    if h and (key.user_id_work[user_id][-2] - 1) == -1:
+        job_pred = key.scheduler.add_job(end_of_day, "cron", hour=23, minute = ((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
+    else:
+        job_pred = key.scheduler.add_job(end_of_day, "cron", hour=key.user_id_work[user_id][-2],
+                                         minute=((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
+    job0 = key.scheduler.add_job(morning, "cron", hour=key.user_id_work[user_id][-2],
+                                 minute=key.user_id_work[user_id][-1], second=0, args=[key.bot, user_id])
+    user.set_time_0(job_pred, job0, ch=key.user_id_work[user_id][-2], m=key.user_id_work[user_id][-1])
 
 
 def set_new_job(user_id, hour=0, minute=0):
+    print(user_id)
     if hour != 0:
-        job = key.user_id_work[user_id][0].job = key.scheduler.add_job(send_every_X_hour, "interval", hours=hour,
+        job = key.scheduler.add_job(send_every_X_hour, "interval", hours=hour,
                                                                        args=[user_id, hour])
     else:
-        job = key.user_id_work[user_id][0].job = key.scheduler.add_job(send_every_15_minute, "interval", minutes=minute,
+        job = key.scheduler.add_job(send_every_15_minute, "interval", minutes=minute,
                                                                        args=[user_id])
     key.user_id_work[user_id][0].set_new_var_job(job)
 
@@ -128,7 +129,8 @@ async def my():  # TODO: create save's
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    con = sqlite3.connect("/root/stat_FBot.db")
+    con = sqlite3.connect("stat_FBot.db")
+    # con = sqlite3.connect("/root/stat_FBot.db")
     key.con = con
 
     scheduler = AsyncIOScheduler()
