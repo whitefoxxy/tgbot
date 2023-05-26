@@ -4,7 +4,6 @@ import random
 
 from aiogram import Bot, Dispatcher
 from aiogram import types
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from handlers import questions, different_types
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -47,54 +46,22 @@ async def send_every_15_minute(user_id):
     await key.bot.send_message(chat_id=user_id, text="Поешь, прошло 15 минут!")
 
 
-async def set_button(user_id, sett=False):
-    if sett:
-        kb = [
-            [
-                types.KeyboardButton(text="Камень-ножницы-бумага"),
-                types.KeyboardButton(text="График"),
-                types.KeyboardButton(text="За день"),
-                types.KeyboardButton(text="За неделю"),
-                types.KeyboardButton(text="Назад")
-            ],
-        ]
-    else:
-        kb = [
-            [
-                types.KeyboardButton(text="Через 1 час"),
-                types.KeyboardButton(text="Через 2 часа"),
-                types.KeyboardButton(text="Через 3 часа"),
-                types.KeyboardButton(text="Через 4 часа"),
-                types.KeyboardButton(text="Перекусила"),
-                types.KeyboardButton(text="Поела"),
-                types.KeyboardButton(text="Статистика")
-            ],
-        ]
-        if datetime.datetime.now().hour > 15:
-            kb[0].append(types.KeyboardButton(text="Сон"))
-
-    builder = ReplyKeyboardBuilder()
-    for i in kb[0]:
-        builder.add(i)
-    builder.adjust(3)
-
-    await key.bot.send_message(chat_id=user_id, text="Примите позу ожидания",
-                               reply_markup=builder.as_markup(resize_keyboard=True,
-                                                              input_field_placeholder="Жду твой выбор =)"))
-
-
 def end_of_day(user_id):
     if key.user_id_work[user_id][0].flag_sleep:
         data_in_table(key.user_id_work[user_id][0])
-        key.user_id_work[user_id][0].incr_var(n=2)
+        key.user_id_work[user_id][0].incr_var(2)
         key.user_id_work[user_id][0].flag_sleep = False
 
 
 def set_new_user_jobs_morning(user_id):  # задание работы на каждое утро
     user = key.user_id_work[user_id][0]
+    print(user.flag_sleep)
     h = (((key.user_id_work[user_id][-1] + 59) % 60) == 59)
     if h and (key.user_id_work[user_id][-2] - 1) == -1:
         job_pred = key.scheduler.add_job(end_of_day, "cron", hour=23, minute = ((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
+    elif h:
+        job_pred = key.scheduler.add_job(end_of_day, "cron", hour=key.user_id_work[user_id][-2] - 1,
+                                         minute=((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
     else:
         job_pred = key.scheduler.add_job(end_of_day, "cron", hour=key.user_id_work[user_id][-2],
                                          minute=((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
@@ -104,7 +71,6 @@ def set_new_user_jobs_morning(user_id):  # задание работы на ка
 
 
 def set_new_job(user_id, hour=0, minute=0):
-    print(user_id)
     if hour != 0:
         job = key.scheduler.add_job(send_every_X_hour, "interval", hours=hour,
                                                                        args=[user_id, hour])
@@ -129,8 +95,8 @@ async def my():  # TODO: create save's
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    # con = sqlite3.connect("stat_FBot.db")
-    con = sqlite3.connect("/root/stat_FBot.db")
+    # con = sqlite3.connect("stat_FBot.db", check_same_thread=False)
+    con = sqlite3.connect("/root/stat_FBot.db", check_same_thread=False)
     key.con = con
 
     scheduler = AsyncIOScheduler()

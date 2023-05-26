@@ -3,7 +3,7 @@ import sqlite3
 
 
 class User:
-    def __init__(self, address, cur: sqlite3.Cursor):
+    def __init__(self, address: int, cur: sqlite3.Cursor):
         # переменные хранящие уникальные для пользователя
         self.ADDRESS = address
         self.t0_ch = 1
@@ -36,6 +36,7 @@ class User:
         return self.cur.execute(f"SELECT eda, perecus FROM Stat_{self.ADDRESS} ORDER BY id DESC LIMIT 7").fetchall()
 
     def data_in_table(self):
+        self.delete_job()
         self.cur.execute(f"INSERT INTO Stat_{self.ADDRESS}(date, eda, perecus) VALUES(?, ?, ?)",
                          [datetime.datetime.today(), self.eda, self.nedo_eda])
 
@@ -54,7 +55,7 @@ class User:
                 self.job = None
 
     def incr_var(self, n=0):
-        if n:
+        if n == 1:
             self.eda += 1
         elif n == 2:
             self.eda, self.nedo_eda = 0, 0

@@ -1,15 +1,51 @@
 import datetime
 import random
 
+from aiogram import types
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.filters.text import Text
 from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.filters import CommandObject
 import bot
 from keyboards import key
 
 router = Router()  # [1]
+
+
+def set_button(sett=False):
+    if sett:
+        kb = [
+            [
+                types.KeyboardButton(text="Камень-ножницы-бумага"),
+                types.KeyboardButton(text="График"),
+                types.KeyboardButton(text="За день"),
+                types.KeyboardButton(text="За неделю"),
+                types.KeyboardButton(text="Назад")
+            ],
+        ]
+    else:
+        kb = [
+            [
+                types.KeyboardButton(text="Через 1 час"),
+                types.KeyboardButton(text="Через 2 часа"),
+                types.KeyboardButton(text="Через 3 часа"),
+                types.KeyboardButton(text="Через 4 часа"),
+                types.KeyboardButton(text="Перекусила"),
+                types.KeyboardButton(text="Поела"),
+                types.KeyboardButton(text="Статистика")
+            ],
+        ]
+        if datetime.datetime.now().hour > 15:
+            kb[0].append(types.KeyboardButton(text="Сон"))
+
+    builder = ReplyKeyboardBuilder()
+    for i in kb[0]:
+        builder.add(i)
+    builder.adjust(3)
+
+    return builder.as_markup(resize_keyboard=True, ninput_field_placeholder="Жду твой выбор =)")
 
 
 @router.message(Command("start"))  # [2]
@@ -34,7 +70,7 @@ async def cmd_time(message: Message, command: CommandObject):
 @router.message(Command("restart"))  # [2]
 async def cmd_restart(message: Message):
     for user_id in list(key.user_id_work.keys()):
-        key.bot.send_message(chat_id=user_id, text="Бот уходит на тех.работы. Прошу прощения за неудобства")
+        await key.bot.send_message(chat_id=user_id, text="Бот уходит на тех.работы. Прошу прощения за неудобства")
 
 
 @router.message(Command("end"))  # [2]
@@ -52,9 +88,8 @@ async def answer_1_hour(message: Message):
     bot.set_new_job(message.chat.id, hour=1)
     await message.answer(
         f"{random.choice(key.waiting_key)} Жду 1 час...",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
-    await bot.set_button(message.chat.id)
 
 
 @router.message(Text(text="Через 2 часа", ignore_case=True))
@@ -62,9 +97,8 @@ async def answer_2_hour(message: Message):
     bot.set_new_job(message.chat.id, hour=2)
     await message.answer(
         f"{random.choice(key.waiting_key)} Жду 2 часа...",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
-    await bot.set_button(message.chat.id)
 
 
 @router.message(Text(text="Через 3 часа", ignore_case=True))
@@ -72,9 +106,8 @@ async def answer_3_hour(message: Message):
     bot.set_new_job(message.chat.id, hour=3)
     await message.answer(
         f"{random.choice(key.waiting_key)} Жду 3 часа...",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
-    await bot.set_button(message.chat.id)
 
 
 @router.message(Text(text="Через 4 часа", ignore_case=True))
@@ -82,19 +115,17 @@ async def answer_4_hour(message: Message):
     bot.set_new_job(message.chat.id, hour=4)
     await message.answer(
         f"{random.choice(key.waiting_key)} Жду 4 часа...",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
-    await bot.set_button(message.chat.id)
 
 
 @router.message(Text(text="Сон", ignore_case=True))
 async def answer_sleep(message: Message):
     await message.answer(
         random.choice(key.nignt_key),
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
     bot.end_of_day(message.chat.id)
-
 
 @router.message(Text(text="Поела", ignore_case=True))
 async def answer_eated(message: Message):
@@ -105,8 +136,8 @@ async def answer_eated(message: Message):
         "Это здорово!",
         reply_markup=ReplyKeyboardRemove()
     )
-    await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}")
-    await bot.set_button(message.chat.id)
+    await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}",
+                               reply_markup=set_button())
 
 
 @router.message(Text(text="Перекусила", ignore_case=True))
@@ -118,21 +149,23 @@ async def answer_eated_no(message: Message):
         "Хоть так)",
         reply_markup=ReplyKeyboardRemove()
     )
-    await key.bot.send_message(chat_id=605850528, text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}")
-    await bot.set_button(message.chat.id)
+    await key.bot.send_message(chat_id=605850528, text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}",
+                               reply_markup=set_button())
 
 
 @router.message(Text(text="Статистика", ignore_case=True))
 async def answer_stat(message: Message):
     await message.answer(
-        "Вот твои данные"
+        "Вот твои данные",
+        reply_markup=set_button(sett=True)
     )
-    await bot.set_button(message.chat.id, sett=True)
 
 
 @router.message(Text(text="Назад", ignore_case=True))
 async def answer_back(message: Message):
-    await bot.set_button(message.chat.id)
+    await message.answer('Возвращаемся в начальное меню...',
+                         reply_markup=set_button()
+                         )
 
 
 @router.message(Text(text="Камень-ножницы-бумага", ignore_case=True))
