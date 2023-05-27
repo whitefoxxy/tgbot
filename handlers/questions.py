@@ -134,10 +134,9 @@ async def answer_eated(message: Message):
 
     await message.answer(
         "Это здорово!",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
-    await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}",
-                               reply_markup=set_button())
+    await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}")
 
 
 @router.message(Text(text="Перекусила", ignore_case=True))
@@ -147,10 +146,9 @@ async def answer_eated_no(message: Message):
 
     await message.answer(
         "Хоть так)",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=set_button()
     )
-    await key.bot.send_message(chat_id=605850528, text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}",
-                               reply_markup=set_button())
+    await key.bot.send_message(chat_id=605850528, text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}")
 
 
 @router.message(Text(text="Статистика", ignore_case=True))
