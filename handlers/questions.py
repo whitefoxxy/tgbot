@@ -52,7 +52,8 @@ def set_button(sett=False):
 async def cmd_start(message: Message):
     if message.chat.id not in key.user_id_work.keys():
         key.user_id_work[message.chat.id] = [key.User(message.chat.id, key.con.cursor()), message.chat.id, 1, 0]
-    await message.answer("По умолчанию время первого вызова 01:00 по МСК.\nВызовите /time HH:MM чтобы изменить это")
+    await message.answer("По умолчанию время первого вызова 01:00 по МСК.\nВызовите /time HH:MM чтобы изменить это",
+                         reply_markup=set_button())
     bot.set_new_user_jobs_morning(message.chat.id)
 
 
@@ -127,28 +128,33 @@ async def answer_sleep(message: Message):
     )
     bot.end_of_day(message.chat.id)
 
+
 @router.message(Text(text="Поела", ignore_case=True))
 async def answer_eated(message: Message):
-    key.user_id_work[message.chat.id][0].delete_job()
     key.user_id_work[message.chat.id][0].incr_var(n=1)
+    bot.set_new_job(message.chat.id, minute=5)
 
     await message.answer(
         "Это здорово!",
         reply_markup=set_button()
     )
-    await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}")
+
+    if message.chat.id == 1404348569:
+        await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}")
 
 
 @router.message(Text(text="Перекусила", ignore_case=True))
 async def answer_eated_no(message: Message):
-    key.user_id_work[message.chat.id][0].delete_job()
     key.user_id_work[message.chat.id][0].incr_var()
+    bot.set_new_job(message.chat.id, minute=5)
 
     await message.answer(
         "Хоть так)",
         reply_markup=set_button()
     )
-    await key.bot.send_message(chat_id=605850528, text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}")
+    if message.chat.id == 1404348569:
+        await key.bot.send_message(chat_id=605850528,
+                                   text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}")
 
 
 @router.message(Text(text="Статистика", ignore_case=True))

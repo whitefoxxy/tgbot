@@ -46,6 +46,10 @@ async def send_every_15_minute(user_id):
     await key.bot.send_message(chat_id=user_id, text="Поешь, прошло 15 минут!")
 
 
+async def send_every_5_minute(user_id):
+    await key.bot.send_message(chat_id=user_id, text="Я не знаю когда запуститься")
+
+
 def end_of_day(user_id):
     if key.user_id_work[user_id][0].flag_sleep:
         data_in_table(key.user_id_work[user_id][0])
@@ -55,10 +59,10 @@ def end_of_day(user_id):
 
 def set_new_user_jobs_morning(user_id):  # задание работы на каждое утро
     user = key.user_id_work[user_id][0]
-    print(user.flag_sleep)
     h = (((key.user_id_work[user_id][-1] + 59) % 60) == 59)
     if h and (key.user_id_work[user_id][-2] - 1) == -1:
-        job_pred = key.scheduler.add_job(end_of_day, "cron", hour=23, minute = ((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
+        job_pred = key.scheduler.add_job(end_of_day, "cron", hour=23,
+                                         minute=((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
     elif h:
         job_pred = key.scheduler.add_job(end_of_day, "cron", hour=key.user_id_work[user_id][-2] - 1,
                                          minute=((key.user_id_work[user_id][-1] + 59) % 60), second=50, args=[user_id])
@@ -73,10 +77,13 @@ def set_new_user_jobs_morning(user_id):  # задание работы на ка
 def set_new_job(user_id, hour=0, minute=0):
     if hour != 0:
         job = key.scheduler.add_job(send_every_X_hour, "interval", hours=hour,
-                                                                       args=[user_id, hour])
-    else:
+                                    args=[user_id, hour])
+    elif minute == 15:
         job = key.scheduler.add_job(send_every_15_minute, "interval", minutes=minute,
-                                                                       args=[user_id])
+                                    args=[user_id])
+    else:
+        job = key.scheduler.add_job(send_every_5_minute, "interval", minutes=minute,
+                                    args=[user_id])
     key.user_id_work[user_id][0].set_new_var_job(job)
 
 
