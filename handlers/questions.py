@@ -68,6 +68,13 @@ async def cmd_time(message: Message, command: CommandObject):
             print("incorrect time: ", command.args)
 
 
+@router.message(Command("msg"))  # [2]
+async def cmd_msg(message: Message, command: CommandObject):
+    s = command.args
+    for user_id in list(key.user_id_work.keys()):
+        await key.bot.send_message(chat_id=user_id, text=s)
+
+
 @router.message(Command("restart"))  # [2]
 async def cmd_restart(message: Message):
     for user_id in list(key.user_id_work.keys()):
@@ -77,6 +84,7 @@ async def cmd_restart(message: Message):
 @router.message(Command("end"))  # [2]
 async def cmd_end(message: Message):
     pass
+    # bot.save_csv()
 
 
 @router.message(Command("help"))  # [2]

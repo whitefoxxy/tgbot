@@ -92,6 +92,20 @@ def data_in_table(user: key.User):
     key.con.commit()
 
 
+def save_csv():
+    with open('/root/user_my.csv', 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=['id'])
+        writer.writeheader()
+        writer.writerows(key.user_id_work)
+
+
+def read_csv():
+    with open('/root/user_my.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            print(row)
+
+
 # Запуск бота
 async def my():  # TODO: create save's
     bot = Bot(token=open("ass.txt").readline())
