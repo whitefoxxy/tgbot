@@ -49,6 +49,11 @@ class User:
             if self.job0 is not None:
                 self.job0.remove()
                 self.job0 = None
+
+            if self.job_last is not None:
+                self.job_last.remove()
+                self.job_last = None
+
         else:
             if self.job is not None:
                 self.job.remove()
