@@ -81,6 +81,11 @@ async def cmd_restart(message: Message):
         await key.bot.send_message(chat_id=user_id, text="Бот уходит на тех.работы. Прошу прощения за неудобства")
 
 
+@router.message(Command("id"))  # [2]
+async def cmd_id(message: Message):
+    print("Your id:", message.chat.id)
+    await message.answer("Your id:" + str(message.chat.id))
+
 @router.message(Command("end"))  # [2]
 async def cmd_end(message: Message):
     pass
