@@ -86,6 +86,7 @@ async def cmd_id(message: Message):
     print("Your id:", message.chat.id)
     await message.answer("Your id:" + str(message.chat.id))
 
+
 @router.message(Command("end"))  # [2]
 async def cmd_end(message: Message):
     pass
