@@ -156,6 +156,9 @@ async def answer_eated(message: Message):
     if message.chat.id == 1404348569:
         await key.bot.send_message(chat_id=605850528, text=f"Поела {key.user_id_work[message.chat.id][0].eda}")
 
+    if message.chat.id == 1906153307:
+        await key.bot.send_message(chat_id=1117720980, text=f"Поела {key.user_id_work[message.chat.id][0].eda}")
+
 
 @router.message(Text(text="Перекусила", ignore_case=True))
 async def answer_eated_no(message: Message):
@@ -169,6 +172,11 @@ async def answer_eated_no(message: Message):
     if message.chat.id == 1404348569:
         await key.bot.send_message(chat_id=605850528,
                                    text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}")
+
+    if message.chat.id == 1906153307:
+        await key.bot.send_message(chat_id=1117720980,
+                                   text=f"перекусила {key.user_id_work[message.chat.id][0].nedo_eda}")
+
 
 
 @router.message(Text(text="Статистика", ignore_case=True))
