@@ -75,7 +75,7 @@ def set_new_user_jobs_morning(user_id):  # задание работы на ка
     user.set_time_0(job_pred, job0, ch=key.user_id_work[user_id][-2], m=key.user_id_work[user_id][-1])
 
 
-def send_after_work():
+async def send_after_work():
     await key.bot.send_message(chat_id=1404348569, text='Время работы истекло, пора кушать)')
     key.user_id_work[1404348569][0].work = False
     set_new_job(1404348569, minute=5)
