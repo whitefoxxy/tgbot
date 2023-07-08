@@ -22,6 +22,7 @@ async def morning(bot, address):
             types.KeyboardButton(text="Через 1 час"),
             types.KeyboardButton(text="Через 2 часа"),
             types.KeyboardButton(text="Перекусила"),
+            types.KeyboardButton(text="Работа"),
             types.KeyboardButton(text="Поела")
         ],
     ]
@@ -74,16 +75,25 @@ def set_new_user_jobs_morning(user_id):  # задание работы на ка
     user.set_time_0(job_pred, job0, ch=key.user_id_work[user_id][-2], m=key.user_id_work[user_id][-1])
 
 
-def set_new_job(user_id, hour=0, minute=0):
-    if hour != 0:
+def send_after_work():
+    await key.bot.send_message(chat_id=1404348569, text='Время работы истекло, пора кушать)')
+    key.user_id_work[1404348569][0].work = False
+    set_new_job(1404348569, minute=5)
+
+
+def set_new_job(user_id, hour=0, minute=0, work=False):
+    if work:
+        job = key.scheduler.add_job(send_after_work, "cron", hour=13)
+    elif hour != 0:
         job = key.scheduler.add_job(send_every_X_hour, "interval", hours=hour,
                                     args=[user_id, hour])
     elif minute == 15:
         job = key.scheduler.add_job(send_every_15_minute, "interval", minutes=minute,
                                     args=[user_id])
-    else:
+    elif minute == 5 and not key.user_id_work[user_id][0].work:
         job = key.scheduler.add_job(send_every_5_minute, "interval", minutes=minute,
                                     args=[user_id])
+
     key.user_id_work[user_id][0].set_new_var_job(job)
 
 

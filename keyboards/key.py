@@ -15,6 +15,7 @@ class User:
         self.job0 = None
         self.job_last = None
         self.flag_sleep = True
+        self.work = False
 
         # функции образующие
         self.create_table()

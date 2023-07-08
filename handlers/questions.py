@@ -32,6 +32,7 @@ def set_button(sett=False):
                 types.KeyboardButton(text="Через 2 часа"),
                 types.KeyboardButton(text="Через 3 часа"),
                 types.KeyboardButton(text="Через 4 часа"),
+                types.KeyboardButton(text="Работа"),
                 types.KeyboardButton(text="Перекусила"),
                 types.KeyboardButton(text="Поела"),
                 types.KeyboardButton(text="Статистика")
@@ -217,7 +218,7 @@ async def answer_day_today(message: Message):
 @router.message(Text(text="За неделю", ignore_case=True))
 async def answer_week_today(message: Message):
     eda, nedo_eda, n = 0, 0, 0
-    for ed, per in key.user_id_work[message.chat.id].data_out_table():
+    for ed, per in key.user_id_work[message.chat.id][0].data_out_table():
         n += 1
         eda += ed
         nedo_eda += per
@@ -225,3 +226,9 @@ async def answer_week_today(message: Message):
     await message.answer(
         f"За неделю(или {n} дней) ты поела: {eda} раз\nПерекусила: {nedo_eda} раз"
     )
+
+@router.message(Text(text="Работа", ignore_case=True))
+async def answer_work_not_walk(message: Message):
+    if message.chat.id == 1404348569:
+        bot.set_new_job(1404348569, work=True)
+        key.user_id_work[1404348569][0].work = True
