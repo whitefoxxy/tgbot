@@ -93,6 +93,11 @@ def set_new_job(user_id, hour=0, minute=0, work=False):
     elif minute == 5 and not key.user_id_work[user_id][0].work:
         job = key.scheduler.add_job(send_every_5_minute, "interval", minutes=minute,
                                     args=[user_id])
+    else:
+        if datetime.datetime.now().hour > 15:
+            key.user_id_work[user_id][0].work = False
+            job = key.scheduler.add_job(send_every_5_minute, "interval", minutes=minute,
+                                        args=[user_id])
 
     key.user_id_work[user_id][0].set_new_var_job(job)
 
