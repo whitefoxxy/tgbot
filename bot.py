@@ -94,7 +94,7 @@ def set_new_job(user_id, hour=0, minute=0, work=False):
         job = key.scheduler.add_job(send_every_5_minute, "interval", minutes=minute,
                                     args=[user_id])
     else:
-        if datetime.datetime.now().hour > 15:
+        if datetime.datetime.now().hour > 12:
             key.user_id_work[user_id][0].work = False
             job = key.scheduler.add_job(send_every_5_minute, "interval", minutes=minute,
                                         args=[user_id])
@@ -108,21 +108,26 @@ def data_in_table(user: key.User):
 
 
 def save_csv():
-    with open('/root/user_my.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=['id'])
-        writer.writeheader()
-        writer.writerows(key.user_id_work)
+    for k in key.user_id_work.keys:
+        with open('/root/user_my.csv', 'w+', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=' ',
+                                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            spamwriter.writerow(
+                [key.user_id_work[k][0].ADDRESS] + [key.user_id_work[k][0].t0_ch] + [key.user_id_work[k][0].t0_m] + [
+                    key.user_id_work[k][0].eda] + [key.user_id_work[k][0].nedo_eda])
 
 
 def read_csv():
     with open('/root/user_my.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            print(row)
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            key.user_id_work[int(row[0])] = [key.User(int(row[0]), key.con.cursor()), int(row[0]), int(row[1]),
+                                             int(row[2])]
+            set_new_user_jobs_morning(int(row[0]))
 
 
 # Запуск бота
-async def my():  # TODO: create save's
+async def my():
     bot = Bot(token=open("ass.txt").readline())
     key.bot = bot
 
@@ -140,6 +145,7 @@ async def my():  # TODO: create save's
 
     key.scheduler = scheduler
     await dp.start_polling(bot)
+    read_csv()
 
 
 if __name__ == "__main__":

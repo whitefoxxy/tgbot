@@ -90,8 +90,7 @@ async def cmd_id(message: Message):
 
 @router.message(Command("end"))  # [2]
 async def cmd_end(message: Message):
-    pass
-    # bot.save_csv()
+    bot.save_csv()
 
 
 @router.message(Command("help"))  # [2]
