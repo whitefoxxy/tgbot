@@ -57,6 +57,10 @@ def end_of_day(user_id):
         key.user_id_work[user_id][0].incr_var(2)
         key.user_id_work[user_id][0].flag_sleep = False
 
+async def cure_for_N():
+    await key.bot.send_message(chat_id=1404348569, text='Пришло время для лекарства')
+def set_cure_job():
+    key.scheduler.add_job(cure_for_N, 'cron', day='*/2', hour=16)
 
 def set_new_user_jobs_morning(user_id):  # задание работы на каждое утро
     user = key.user_id_work[user_id][0]

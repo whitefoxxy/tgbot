@@ -22,6 +22,7 @@ def set_button(sett=False):
                 types.KeyboardButton(text="График"),
                 types.KeyboardButton(text="За день"),
                 types.KeyboardButton(text="За неделю"),
+                types.KeyboardButton(text="Лекарство"),
                 types.KeyboardButton(text="Назад")
             ],
         ]
@@ -56,6 +57,8 @@ async def cmd_start(message: Message):
     await message.answer("По умолчанию время первого вызова 01:00 по МСК.\nВызовите /time HH:MM чтобы изменить это",
                          reply_markup=set_button())
     bot.set_new_user_jobs_morning(message.chat.id)
+    if message.chat.id == 1404348569:
+        bot.set_cure_job()
 
 
 @router.message(Command("time"))  # [2]
@@ -231,3 +234,9 @@ async def answer_work_not_walk(message: Message):
     if message.chat.id == 1404348569:
         bot.set_new_job(1404348569, work=True)
         key.user_id_work[1404348569][0].work = True
+
+@router.message(Text(text="Лекарство", ignore_case=True))
+async def answer_ill(message: Message):
+    if message.chat.id == 1404348569:
+        await message.answer(random.choice(['ваш *тык* засчитан', "Ещё один день в копилку", "моё почтение...", "туц-тудуц", "Мяу"]))
+
