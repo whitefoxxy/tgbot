@@ -140,8 +140,8 @@ async def my():
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    con = sqlite3.connect("stat_FBot.db", check_same_thread=False)
-    # con = sqlite3.connect("/root/stat_FBot.db", check_same_thread=False)
+    # con = sqlite3.connect("stat_FBot.db", check_same_thread=False)
+    con = sqlite3.connect("/root/stat_FBot.db", check_same_thread=False)
     key.con = con
 
     scheduler = AsyncIOScheduler()
