@@ -57,7 +57,7 @@ async def cmd_start(message: Message):
     await message.answer("По умолчанию время первого вызова 01:00 по МСК.\nВызовите /time HH:MM чтобы изменить это",
                          reply_markup=set_button())
     bot.set_new_user_jobs_morning(message.chat.id)
-    if message.chat.id == 1404348569:
+    if message.chat.id in [1404348569, 605850528]:
         bot.set_cure_job()
 
 
