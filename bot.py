@@ -60,7 +60,7 @@ def end_of_day(user_id):
 async def cure_for_N():
     await key.bot.send_message(chat_id=1404348569, text='Пришло время для лекарства')
 def set_cure_job():
-    key.scheduler.add_job(cure_for_N, 'cron', day='*/2', hour=16)
+    key.scheduler.add_job(cure_for_N, 'cron', day_of_week='*/2', hour=16, minute=0)
 
 def set_new_user_jobs_morning(user_id):  # задание работы на каждое утро
     user = key.user_id_work[user_id][0]
@@ -140,8 +140,8 @@ async def my():
 
     await bot.delete_webhook(drop_pending_updates=True)
 
-    # con = sqlite3.connect("stat_FBot.db", check_same_thread=False)
-    con = sqlite3.connect("/root/stat_FBot.db", check_same_thread=False)
+    con = sqlite3.connect("stat_FBot.db", check_same_thread=False)
+    # con = sqlite3.connect("/root/stat_FBot.db", check_same_thread=False)
     key.con = con
 
     scheduler = AsyncIOScheduler()
