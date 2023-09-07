@@ -58,7 +58,7 @@ def end_of_day(user_id):
         key.user_id_work[user_id][0].flag_sleep = False
 
 async def cure_for_N():
-    await key.bot.send_message(chat_id=1404348569, text='Пришло время для лекарства')
+    await key.bot.send_message(chat_id=1404348569, text='Пришло время для лекарства', reply_markup=questions.set_button(leck=True))
 def set_cure_job():
     key.scheduler.add_job(cure_for_N, 'interval', days=2, start_date='2023-09-06 16:00:00')
 

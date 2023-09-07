@@ -14,7 +14,7 @@ from keyboards import key
 router = Router()  # [1]
 
 
-def set_button(sett=False):
+def set_button(sett=False, leck=False):
     if sett:
         kb = [
             [
@@ -22,9 +22,14 @@ def set_button(sett=False):
                 types.KeyboardButton(text="График"),
                 types.KeyboardButton(text="За день"),
                 types.KeyboardButton(text="За неделю"),
-                types.KeyboardButton(text="Лекарство"),
                 types.KeyboardButton(text="Назад")
             ],
+        ]
+    elif leck:
+        kb = [
+            [
+                types.KeyboardButton(text="Лекарство"),
+            ]
         ]
     else:
         kb = [
@@ -238,5 +243,5 @@ async def answer_work_not_walk(message: Message):
 @router.message(Text(text="Лекарство", ignore_case=True))
 async def answer_ill(message: Message):
     if message.chat.id == 1404348569:
-        await message.answer(random.choice(['ваш *тык* засчитан', "Ещё один день в копилку", "моё почтение...", "туц-тудуц", "Мяу"]))
+        await message.answer(random.choice(['ваш *тык* засчитан', "Ещё один день в копилку", "моё почтение...", "туц-тудуц", "Мяу"]), reply_markup=set_button())
 
