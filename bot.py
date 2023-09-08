@@ -112,7 +112,7 @@ def data_in_table(user: key.User):
 
 
 def save_csv():
-    for k in key.user_id_work.keys:
+    for k in list(key.user_id_work.keys):
         with open('/root/user_my.csv', 'w+', newline='') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
