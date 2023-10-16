@@ -64,6 +64,7 @@ async def cmd_start(message: Message):
     bot.set_new_user_jobs_morning(message.chat.id)
 
 
+
 @router.message(Command("time"))  # [2]
 async def cmd_time(message: Message, command: CommandObject):
     if message.chat.id in key.user_id_work.keys():
